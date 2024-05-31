@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Turing Pattern</title>
+    
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"
+      integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ=="
+      crossorigin="anonymous"
+    defer></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script type="module" src="init_element.js"></script>
+    <script type="module" src="main.js"></script>
+
+    <style>
+      body {
+        background: black;
+        color: black; 
+      }
+      #myText {
+        position: relative;
+        width: 1000px;
+        /* top: 900px; */
+        left: 50%;
+        margin: 0 0 0 -500px;
+        color: black;
+        font-family: Georgia, "New Century Schoolbook", Times, serif; 
+        font-size: 18px;
+        line-height: 1.8;
+        /* padding: 20px; */
+      }
+    </style>
+
+  </head>
+
+
+    <body style="background-color: #E5E5E5;">
+    <!-- <body style="background-color: black;"> -->
+      <div>
+        <center id="canvas_block">
+          <!-- <canvas id="glcanvas" width="500px" height="500px" style="margin-left: -50%;"></canvas> -->
+        </center>
+
+        <center>
+
+          <label for="preset">Preset:</label>
+          <select name="preset" id="preset">
+          </select>
+
+          <label for="diffuse"> 
+            Diffuse: 
+          </label> 
+          <input type="number" id="diffuse" 
+          name="diffuse" min="0" 
+          max="1" step="0.01" value="1.0" />
+
+          <label for="feed"> 
+            Feed: 
+          </label> 
+          <input type="number" id="feed" 
+          name="feed" min="0" 
+          max="1" step="0.001" value="0.0545" />
+          
+          <label for="kill"> 
+            Kill: 
+          </label> 
+          <input type="number" id="kill" 
+          name="kill" min="0" 
+          max="1" step="0.001" value="0.062" />
+
+          <button type="button" id="reset">reset</button> 
+          <label for="update">
+            update:
+          </label>
+          <input type="checkbox" id="update" name="update" value="update" checked>
+        </center>
+
+        <p id="myText">
+          Welcom to "Turing Pattern" generator, you can try generating your own turing pattern from various parameters.
+          You can tune parameters by yourself or select presets. Additionally, you can click on the right image to get
+          the parameters for a pattern shown in the image.
+        </p>
+        <h2 id="myText">
+          How to use.
+        </h2>
+        <ul id="myText">
+          <li>
+            Click on the canvas to put substance onto the canvas and wait for the pattern to emerge.
+          </li>
+          <li>
+            Try changing value of Feed and Kill to get a new pattern, or use presets available in a dropdown selection.
+          </li>
+          <li>
+            Click on the picture of the left to get parameters for those pattern.
+          </li>
+          <li>
+            Some of the pattern may not spread by it own. You may have to re-paint substance by press on the canvas.
+          </li>
+        </ul>
+        <br>
+        <h2 id="myText">
+          What is Turing Pattern?
+        </h2>
+        <p id="myText">
+          It is a mathemetical model that models how patterns in nature emerge, for example dotted pattern on leopard or
+          finger print. In this model, it consists of substances, A and B. These two substances diffuse into space and 
+          substance A diffuses two time faster than substance B. There are three reactions happen in this model.
+        </p>
+        <ol id="myText">
+          <li>
+            A concentration of substance A increase inversely propotionally to its concentration.
+          </li>
+          <li>
+            A concentration of substance B decrease propotionally to its concentration.
+          </li>
+          <li>
+            Combination between two substance A and one substance B results in three substance B.
+          </li>
+        </ol>
+        <p id="myText">
+          The dynamic of the system can be described by two differential equations:
+        </p>
+        <center>
+          <p>
+            \(\frac{\partial A}{\partial t} = D\nabla^2 A - AB^2 + F (1 - A) \)
+          </p>
+          <p>
+            \(\frac{\partial B}{\partial t} = 0.5D\nabla^2 B + AB^2 + (F + K) B \)
+          </p>
+        </center>
+        <p id="myText">
+          \(\nabla^2 A\) and \(\nabla^2 B\) describe the diffusion of the substances. In this implementation, these terms are
+          implemented by 2D lapacian. The term \(F(1 - A)\), \((F + K)B\) and \(AB^2\) describe the first, second and third 
+          reaction respectively. \(D\) is diffusion rate. \(F\) and \(K\) are parameters that control rate of the first and 
+          second reaction. By changing these three parameters, different pattern will emerge. 
+        </p>
+
+        <p id="myText">
+          The image below shows various patterns from different value of \(K\) and \(F\). Y axis ranges from \(F=0.01\) to \(F=0.095\) 
+          and X axis ranges from \(K=0.032\) to \(K=0.07\), notice that patterns emerge only in this small region and seem to group up 
+          along the curve. I stretch the area around the curve inside an orange polygon into square as you can see at the demo. 
+        </p>
+        <center>
+          <img src="image/flat_poly.png" style="max-height: 70vh;">
+          <img src="image/stretch_highrez.png" style="filter: grayscale();max-height: 70vh;">
+        </center>
+
+        <p id="myText">
+          One of the interesting fact is when we find the value of A and B that makes the system static. In other word,
+          the values that makes \(\frac{\partial A}{\partial t}\) and \(\frac{\partial B}{\partial t}\) equal to  zero. 
+        </p>
+        <p id="myText">
+          NOTE: We will ignore the diffusion term (because I have no idea how to analyse the equation with them, someone help me!!!!).
+        </p>
+        <p id="myText">
+          There are three fixed points in total.
+        </p>
+        
+        <ul id="myText">
+          <li>
+            \((A_1,B_1) = (1,0)\)
+          </li>
+          <li>
+            \((A_{2,3},B_{2,3}) = \frac{F \pm \sqrt{F^2-4F(F+K)^2}}{2F}, \frac{F \mp \sqrt{F^2 - 4F(F+K)^2}}{2(F+K)}\)
+          </li>
+        </ul>
+
+        <p id="myText">
+          We can see that second and third solution exist if \(F^2 > 4F(F+K)^2\). If we plot the graph \(F^2 = 4F(F+K)^2\) onto
+          the above picture, this graph interestingly lies in the area where patterns densly packed. This maybe just a conincident
+          or there really are relations between how pattern emerges and the graph. I actually do not know. I may have to study more
+          on this topic.
+        </p>
+
+        <center>
+          <img src="image/flat_plot.png" style="max-height: 70vh;">
+        </center>
+
+    </body>
+
+</html>
