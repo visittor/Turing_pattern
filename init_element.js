@@ -129,6 +129,12 @@ function Settings()
         Settings.mouseY = canvas.height - (e.clientY - rect.top);
     });
 
+    canvas.addEventListener("touchmove", (e) => {
+        let rect = e.target.getBoundingClientRect();
+        Settings.mouseX = e.touches[0].clientX - rect.left;
+        Settings.mouseY = canvas.height - (e.touches[0].clientY - rect.top);
+    })
+    
     canvas.addEventListener("mousedown", (e) => {
         let rect = e.target.getBoundingClientRect();
         Settings.mouseDown = 1;
@@ -136,6 +142,13 @@ function Settings()
         Settings.mouseY = canvas.height - (e.clientY - rect.top);
 
         console.log(Settings.mouseX, Settings.mouseY, Settings.mouseDown);
+    });
+    
+    canvas.addEventListener("touchstart", (e) => {
+        let rect = e.target.getBoundingClientRect();
+        Settings.mouseDown = 1;
+        Settings.mouseX = e.touches[0].clientX - rect.left;
+        Settings.mouseY = canvas.height - (e.touches[0].clientY - rect.top);
     });
 
     canvas.addEventListener("mouseup", (e) => {
@@ -145,11 +158,41 @@ function Settings()
         Settings.mouseY = canvas.height - (e.clientY - rect.top);
     });
 
+    canvas.addEventListener("touchend", (e) => {
+        let rect = e.target.getBoundingClientRect();
+        Settings.mouseDown = 0;
+        Settings.mouseX = e.touches[0].clientX - rect.left;
+        Settings.mouseY = canvas.height - (e.touches[0].clientY - rect.top);
+    });
 
     image.addEventListener("mousedown", (e) => {
         let rect = e.target.getBoundingClientRect();
         let mouseX = e.clientX - rect.left;
         let mouseY = image.height - (e.clientY - rect.top);
+
+        mouseX *= Settings.killfeedTexture.getWidth() / image.width;
+        mouseY *= Settings.killfeedTexture.getHeight() / image.height;
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, Settings.fbo);
+        gl.framebufferTexture2D(
+                                gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, 
+                                Settings.killfeedTexture.getReadTexture(), 0
+                            );
+        let pixels = new Float32Array(1 * 1 * 4);
+        gl.readPixels(mouseX, mouseY, 1, 1, gl.RGBA, gl.FLOAT, pixels);
+        console.log(pixels, mouseX, mouseY);
+
+        kill_input.value = pixels[0];
+        feed_input.value = pixels[1];
+
+        Settings.kill = pixels[0];
+        Settings.feed = pixels[1];
+    });
+
+    image.addEventListener("touchstart", (e) => {
+        let rect = e.target.getBoundingClientRect();
+        let mouseX = e.touches[0].clientX - rect.left;
+        let mouseY = image.height - (e.touches[0].clientY - rect.top);
 
         mouseX *= Settings.killfeedTexture.getWidth() / image.width;
         mouseY *= Settings.killfeedTexture.getHeight() / image.height;
