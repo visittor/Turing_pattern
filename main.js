@@ -69,7 +69,7 @@ function main()
     gl.blendFunc(gl.SRC_ALPHA, gl.ZERO);
     gl.enable(gl.BLEND);
 
-    // initComputeTexture(gl, computeTexture, fbo);
+    initComputeTexture(gl, computeTexture, fbo);
 
     function render(now)
     {
